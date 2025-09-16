@@ -1,6 +1,7 @@
 from flask import Flask
 from pymongo import MongoClient
 import os
+import certifi
 
 # Variable global para la conexión a MongoDB
 db_client = None
@@ -15,7 +16,8 @@ def create_app():
     mongo_uri = "mongodb+srv://admin:jW0DwZFZuWsTxXym@alberteinstein.lftfvkl.mongodb.net/plataforma_simulacros?retryWrites=true&w=majority&appName=AlbertEinstein"
     
     try:
-        db_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        ca = certifi.where()
+        db_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000, tlsCAFile=ca)
         db = db_client.plataforma_simulacros
         # Verificar conexión
         db_client.admin.command('ping')
