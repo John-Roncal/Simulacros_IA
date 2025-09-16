@@ -1,4 +1,4 @@
-from app import db
+import app
 from datetime import datetime
 from bson import ObjectId
 
@@ -30,29 +30,29 @@ class Usuario:
             "fecha_creacion": self.fecha_creacion
         }
         
-        result = db.usuarios.insert_one(usuario_data)
+        result = app.db.usuarios.insert_one(usuario_data)
         self._id = result.inserted_id
         return result
     
     @staticmethod
     def find_all():
         """Obtener todos los usuarios"""
-        return list(db.usuarios.find())
+        return list(app.db.usuarios.find())
     
     @staticmethod
     def find_by_id(usuario_id):
         """Buscar usuario por ID"""
-        return db.usuarios.find_one({"usuario_id": usuario_id})
+        return app.db.usuarios.find_one({"usuario_id": usuario_id})
     
     @staticmethod
     def find_by_email(correo):
         """Buscar usuario por email"""
-        return db.usuarios.find_one({"correo": correo})
+        return app.db.usuarios.find_one({"correo": correo})
     
     @staticmethod
     def update_by_id(usuario_id, update_data):
         """Actualizar usuario por ID"""
-        return db.usuarios.update_one(
+        return app.db.usuarios.update_one(
             {"usuario_id": usuario_id}, 
             {"$set": update_data}
         )
@@ -60,7 +60,7 @@ class Usuario:
     @staticmethod
     def delete_by_id(usuario_id):
         """Eliminar usuario por ID"""
-        return db.usuarios.delete_one({"usuario_id": usuario_id})
+        return app.db.usuarios.delete_one({"usuario_id": usuario_id})
     
     def to_json(self):
         """Convertir a diccionario para JSON"""
