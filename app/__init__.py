@@ -1,18 +1,28 @@
 from flask import Flask
-from flask_mongoengine import MongoEngine
+from pymongo import MongoClient
+import os
 
-db = MongoEngine()
+# Variable global para la conexión a MongoDB
+db_client = None
+db = None
 
 def create_app():
+    global db_client, db
+    
     app = Flask(__name__)
 
-    # Configuración MongoDB (Atlas o Local)
-    app.config["MONGODB_SETTINGS"] = {
-        "db": "plataforma_simulacros",
-        "host": "mongodb+srv://admin:jW0DwZFZuWsTxXym@alberteinstein.lftfvkl.mongodb.net/plataforma_simulacros?retryWrites=true&w=majority&appName=AlbertEinstein",
-    }
-
-    db.init_app(app)
+    # Configuración MongoDB Atlas
+    mongo_uri = "mongodb+srv://admin:jW0DwZFZuWsTxXym@alberteinstein.lftfvkl.mongodb.net/plataforma_simulacros?retryWrites=true&w=majority&appName=AlbertEinstein"
+    
+    try:
+        db_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+        db = db_client.plataforma_simulacros
+        # Verificar conexión
+        db_client.admin.command('ping')
+        print("✅ Conexión exitosa a MongoDB Atlas")
+    except Exception as e:
+        print(f"❌ Error conectando a MongoDB: {e}")
+        print("La aplicación continuará sin base de datos")
 
     # Importar rutas
     from .routes.usuario_routes import usuario_bp
