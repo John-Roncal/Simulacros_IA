@@ -30,6 +30,7 @@ def crear_intento():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @intento_bp.route("/<string:intento_id>/finalizar", methods=["PUT"])
 def finalizar_intento(intento_id):
     """Finaliza un intento, envía las respuestas y calcula la calificación."""
@@ -86,6 +87,7 @@ def finalizar_intento(intento_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @intento_bp.route("/alumno/<string:alumno_id>", methods=["GET"])
 def listar_intentos_alumno(alumno_id):
     """Listar todos los intentos de un alumno."""
@@ -97,6 +99,7 @@ def listar_intentos_alumno(alumno_id):
         return jsonify(intentos), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @intento_bp.route("/<string:intento_id>", methods=["GET"])
 def obtener_intento(intento_id):

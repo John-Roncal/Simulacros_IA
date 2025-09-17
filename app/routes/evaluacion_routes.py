@@ -54,6 +54,7 @@ def crear_evaluacion():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @evaluacion_bp.route("/", methods=["GET"])
 def listar_evaluaciones():
     """Listar todas las evaluaciones"""
@@ -65,6 +66,7 @@ def listar_evaluaciones():
         return jsonify(evaluaciones), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
 
 @evaluacion_bp.route("/<string:evaluacion_id>", methods=["GET"])
 def obtener_evaluacion(evaluacion_id):
@@ -79,6 +81,7 @@ def obtener_evaluacion(evaluacion_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @evaluacion_bp.route("/<string:evaluacion_id>", methods=["PUT"])
 def actualizar_evaluacion(evaluacion_id):
     """Actualizar una evaluación"""
@@ -91,6 +94,7 @@ def actualizar_evaluacion(evaluacion_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @evaluacion_bp.route("/<string:evaluacion_id>", methods=["DELETE"])
 def eliminar_evaluacion(evaluacion_id):
     """Eliminar una evaluación"""
@@ -101,6 +105,7 @@ def eliminar_evaluacion(evaluacion_id):
         return jsonify({"msg": "Evaluación eliminada exitosamente"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @evaluacion_bp.route("/docente/<string:docente_id>", methods=["GET"])
 def listar_evaluaciones_docente(docente_id):
@@ -113,6 +118,7 @@ def listar_evaluaciones_docente(docente_id):
         return jsonify(evaluaciones), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @evaluacion_bp.route("/grado/<string:grado>/seccion/<string:seccion>", methods=["GET"])
 def listar_evaluaciones_grado_seccion(grado, seccion):
