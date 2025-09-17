@@ -31,11 +31,13 @@ def create_app():
     from .routes.evaluacion_routes import evaluacion_bp
     from .routes.intento_routes import intento_bp
     from .routes.reporte_routes import reporte_bp
+    from .routes.notificacion_routes import notificacion_bp
 
     # Registrar Blueprints
     app.register_blueprint(usuario_bp, url_prefix="/usuarios")
     app.register_blueprint(evaluacion_bp, url_prefix="/evaluaciones")
     app.register_blueprint(intento_bp, url_prefix="/intentos")
     app.register_blueprint(reporte_bp, url_prefix="/reportes")
+    app.register_blueprint(notificacion_bp, url_prefix="/notificaciones")
 
     return app
