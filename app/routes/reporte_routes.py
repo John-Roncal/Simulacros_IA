@@ -28,6 +28,7 @@ def crear_reporte():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @reporte_bp.route("/intento/<string:intento_id>", methods=["GET"])
 def obtener_reporte_por_intento(intento_id):
     """Obtener reporte por ID de intento."""
@@ -41,6 +42,7 @@ def obtener_reporte_por_intento(intento_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @reporte_bp.route("/<string:reporte_id>", methods=["GET"])
 def obtener_reporte(reporte_id):
     """Obtener un reporte específico por su ID."""
@@ -53,6 +55,7 @@ def obtener_reporte(reporte_id):
         return jsonify(reporte), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @reporte_bp.route("/<string:reporte_id>/retroalimentacion", methods=["PUT"])
 def agregar_retroalimentacion_docente(reporte_id):
@@ -69,7 +72,7 @@ def agregar_retroalimentacion_docente(reporte_id):
         result = Reporte.update_by_id(reporte_id, update_data)
         if result.matched_count == 0:
             return jsonify({"error": "Reporte no encontrado"}), 404
-            
+
         return jsonify({"msg": "Retroalimentación agregada exitosamente"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
