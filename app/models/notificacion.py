@@ -13,7 +13,7 @@ class Notificacion:
 
     def save(self):
         """Guardar notificación en MongoDB"""
-        if not db:
+        if db is None:
             raise Exception("No hay conexión a la base de datos")
 
         notificacion_data = {
@@ -32,28 +32,28 @@ class Notificacion:
     @staticmethod
     def find_all():
         """Obtener todas las notificaciones"""
-        if not db:
+        if db is None:
             return []
         return list(db.notificaciones.find())
 
     @staticmethod
     def find_by_id(notificacion_id):
         """Buscar notificación por ID"""
-        if not db:
+        if db is None:
             return None
         return db.notificaciones.find_one({"notificacion_id": notificacion_id})
 
     @staticmethod
     def find_by_usuario(usuario_id):
         """Buscar notificaciones por usuario"""
-        if not db:
+        if db is None:
             return []
         return list(db.notificaciones.find({"usuario_id": usuario_id}))
 
     @staticmethod
     def update_by_id(notificacion_id, update_data):
         """Actualizar notificación por ID"""
-        if not db:
+        if db is None:
             return None
         return db.notificaciones.update_one(
             {"notificacion_id": notificacion_id},
@@ -63,7 +63,7 @@ class Notificacion:
     @staticmethod
     def delete_by_id(notificacion_id):
         """Eliminar notificación por ID"""
-        if not db:
+        if db is None:
             return None
         return db.notificaciones.delete_one({"notificacion_id": notificacion_id})
 

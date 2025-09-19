@@ -29,7 +29,7 @@ class Intento:
     
     def save(self):
         """Guardar intento en MongoDB"""
-        if not db:
+        if db is None:
             raise Exception("No hay conexión a la base de datos")
             
         intento_data = {
@@ -50,35 +50,35 @@ class Intento:
     @staticmethod
     def find_all():
         """Obtener todos los intentos"""
-        if not db:
+        if db is None:
             return []
         return list(db.intentos.find())
     
     @staticmethod
     def find_by_id(intento_id):
         """Buscar intento por ID"""
-        if not db:
+        if db is None:
             return None
         return db.intentos.find_one({"intento_id": intento_id})
     
     @staticmethod
     def find_by_alumno(alumno_id):
         """Buscar intentos por alumno"""
-        if not db:
+        if db is None:
             return []
         return list(db.intentos.find({"alumno_id": alumno_id}))
     
     @staticmethod
     def find_by_evaluacion(evaluacion_id):
         """Buscar intentos por evaluación"""
-        if not db:
+        if db is None:
             return []
         return list(db.intentos.find({"evaluacion_id": evaluacion_id}))
     
     @staticmethod
     def update_by_id(intento_id, update_data):
         """Actualizar intento por ID"""
-        if not db:
+        if db is None:
             return None
         return db.intentos.update_one(
             {"intento_id": intento_id}, 
@@ -88,7 +88,7 @@ class Intento:
     @staticmethod
     def delete_by_id(intento_id):
         """Eliminar intento por ID"""
-        if not db:
+        if db is None:
             return None
         return db.intentos.delete_one({"intento_id": intento_id})
     
