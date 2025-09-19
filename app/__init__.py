@@ -1,5 +1,6 @@
 from flask import Flask
 from pymongo import MongoClient
+from flask_cors import CORS
 import os
 import certifi
 
@@ -11,6 +12,7 @@ def create_app():
     global db_client, db
     
     app = Flask(__name__)
+    CORS(app)
 
     # Configuración MongoDB Atlas
     mongo_uri = "mongodb+srv://admin:jW0DwZFZuWsTxXym@alberteinstein.lftfvkl.mongodb.net/plataforma_simulacros?retryWrites=true&w=majority&appName=AlbertEinstein"
