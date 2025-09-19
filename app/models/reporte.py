@@ -14,7 +14,7 @@ class Reporte:
     
     def save(self):
         """Guardar reporte en MongoDB"""
-        if not db:
+        if db is None:
             raise Exception("No hay conexión a la base de datos")
             
         reporte_data = {
@@ -33,28 +33,28 @@ class Reporte:
     @staticmethod
     def find_all():
         """Obtener todos los reportes"""
-        if not db:
+        if db is None:
             return []
         return list(db.reportes.find())
     
     @staticmethod
     def find_by_id(reporte_id):
         """Buscar reporte por ID"""
-        if not db:
+        if db is None:
             return None
         return db.reportes.find_one({"reporte_id": reporte_id})
     
     @staticmethod
     def find_by_intento(intento_id):
         """Buscar reporte por intento"""
-        if not db:
+        if db is None:
             return None
         return db.reportes.find_one({"intento_id": intento_id})
     
     @staticmethod
     def update_by_id(reporte_id, update_data):
         """Actualizar reporte por ID"""
-        if not db:
+        if db is None:
             return None
         return db.reportes.update_one(
             {"reporte_id": reporte_id}, 
@@ -64,7 +64,7 @@ class Reporte:
     @staticmethod
     def delete_by_id(reporte_id):
         """Eliminar reporte por ID"""
-        if not db:
+        if db is None:
             return None
         return db.reportes.delete_one({"reporte_id": reporte_id})
     

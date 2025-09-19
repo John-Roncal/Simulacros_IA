@@ -36,7 +36,7 @@ class Evaluacion:
     
     def save(self):
         """Guardar evaluación en MongoDB"""
-        if not db:
+        if db is None:
             raise Exception("No hay conexión a la base de datos")
             
         evaluacion_data = {
@@ -60,35 +60,35 @@ class Evaluacion:
     @staticmethod
     def find_all():
         """Obtener todas las evaluaciones"""
-        if not db:
+        if db is None:
             return []
         return list(db.evaluaciones.find())
     
     @staticmethod
     def find_by_id(evaluacion_id):
         """Buscar evaluación por ID"""
-        if not db:
+        if db is None:
             return None
         return db.evaluaciones.find_one({"evaluacion_id": evaluacion_id})
     
     @staticmethod
     def find_by_docente(docente_id):
         """Buscar evaluaciones por docente"""
-        if not db:
+        if db is None:
             return []
         return list(db.evaluaciones.find({"docente_id": docente_id}))
     
     @staticmethod
     def find_by_grado_seccion(grado, seccion):
         """Buscar evaluaciones por grado y sección"""
-        if not db:
+        if db is None:
             return []
         return list(db.evaluaciones.find({"grado": grado, "seccion": seccion}))
     
     @staticmethod
     def update_by_id(evaluacion_id, update_data):
         """Actualizar evaluación por ID"""
-        if not db:
+        if db is None:
             return None
         return db.evaluaciones.update_one(
             {"evaluacion_id": evaluacion_id}, 
@@ -98,7 +98,7 @@ class Evaluacion:
     @staticmethod
     def delete_by_id(evaluacion_id):
         """Eliminar evaluación por ID"""
-        if not db:
+        if db is None:
             return None
         return db.evaluaciones.delete_one({"evaluacion_id": evaluacion_id})
     
