@@ -79,11 +79,11 @@ class Evaluacion:
         return list(db.evaluaciones.find({"docente_id": docente_id}))
     
     @staticmethod
-    def find_by_grado_seccion(grado, seccion):
-        """Buscar evaluaciones por grado y sección"""
+    def find_by_filters(filters):
+        """Buscar evaluaciones por filtros"""
         if db is None:
             return []
-        return list(db.evaluaciones.find({"grado": grado, "seccion": seccion}))
+        return list(db.evaluaciones.find(filters))
     
     @staticmethod
     def update_by_id(evaluacion_id, update_data):
