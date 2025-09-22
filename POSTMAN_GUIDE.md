@@ -8,21 +8,21 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
 
 ---
 
-### 1. Crear un Usuario (Alumno)
+### 1. Gestión de Usuarios
+
+#### 1.1 Crear un Usuario Alumno
 
 - **Método:** `POST`
-- **URL:** `/usuarios/`
-- **Descripción:** Registra un nuevo usuario en el sistema.
+- **URL:** `/usuarios/crear/alumno`
+- **Descripción:** Registra un nuevo alumno. El `usuario_id` es autoincremental.
 
 **Cuerpo (Body) - `raw (JSON)`:**
 ```json
 {
-    "usuario_id": "alumno_01",
     "nombre": "Juan",
     "apellido": "Perez",
     "correo": "juan.perez@email.com",
     "contraseña": "password123",
-    "rol": "Alumno",
     "grado": "5",
     "seccion": "A"
 }
@@ -31,18 +31,81 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
 **Respuesta Exitosa (201 Created):**
 ```json
 {
-    "msg": "Usuario creado exitosamente",
-    "usuario_id": "alumno_01"
+    "msg": "Alumno creado exitosamente",
+    "usuario_id": 1
 }
 ```
 
----
-
-### 2. Crear una Evaluación
+#### 1.2 Crear un Usuario Docente
 
 - **Método:** `POST`
-- **URL:** `/evaluaciones/`
-- **Descripción:** Permite a un docente crear una nueva evaluación con sus preguntas.
+- **URL:** `/usuarios/crear/docente`
+- **Descripción:** Registra un nuevo docente. Puede tener múltiples grados y secciones.
+
+**Cuerpo (Body) - `raw (JSON)`:**
+```json
+{
+    "usuario_id": "docente_01",
+    "nombre": "Maria",
+    "apellido": "Gonzalez",
+    "correo": "maria.gonzalez@email.com",
+    "contraseña": "password123",
+    "grado": ["5", "6"],
+    "seccion": ["A", "B"]
+}
+```
+
+**Respuesta Exitosa (201 Created):**
+```json
+{
+    "msg": "Docente creado exitosamente",
+    "usuario_id": "docente_01"
+}
+```
+
+#### 1.3 Crear un Usuario Admin
+
+- **Método:** `POST`
+- **URL:** `/usuarios/crear/admin`
+- **Descripción:** Registra un nuevo administrador.
+
+**Cuerpo (Body) - `raw (JSON)`:**
+```json
+{
+    "usuario_id": "admin_01",
+    "nombre": "Admin",
+    "apellido": "Principal",
+    "correo": "admin@email.com",
+    "contraseña": "password123"
+}
+```
+
+**Respuesta Exitosa (201 Created):**
+```json
+{
+    "msg": "Admin creado exitosamente",
+    "usuario_id": "admin_01"
+}
+```
+
+#### 1.4 Listar, Actualizar y Anular Usuarios
+
+- **Listar Alumnos:** `GET /usuarios/alumnos`
+- **Obtener Alumno:** `GET /usuarios/alumnos/<usuario_id>`
+- **Actualizar Alumno:** `PUT /usuarios/alumnos/<usuario_id>`
+- **Anular Alumno:** `DELETE /usuarios/alumnos/<usuario_id>`
+
+*(Lo mismo aplica para `/docentes` y `/admins`)*
+
+---
+
+### 2. Gestión de Evaluaciones
+
+#### 2.1 Crear una Evaluación
+
+- **Método:** `POST`
+- **URL:** `/evaluaciones/crear`
+- **Descripción:** Permite a un docente crear una nueva evaluación.
 
 **Cuerpo (Body) - `raw (JSON)`:**
 ```json
@@ -60,12 +123,6 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
             "enunciado": "¿Cuánto es 2 + 2?",
             "opciones": ["3", "4", "5"],
             "respuesta_correcta": "4"
-        },
-        {
-            "tipo": "VF",
-            "enunciado": "La Tierra es plana.",
-            "opciones": ["Verdadero", "Falso"],
-            "respuesta_correcta": "Falso"
         }
     ]
 }
@@ -78,14 +135,11 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
     "evaluacion_id": "<ID_DE_LA_EVALUACION_GENERADO>"
 }
 ```
-*(Nota: Guarda el `evaluacion_id` para los siguientes pasos.)*
 
----
-
-### 3. Listar Evaluaciones para un Alumno
+#### 2.2 Listar Evaluaciones con Filtros
 
 - **Método:** `GET`
-- **URL:** `/evaluaciones/grado/5/seccion/A`
+- **URL:** `/evaluaciones/listado?grado=5&seccion=A`
 - **Descripción:** Obtiene todas las evaluaciones disponibles para un grado y sección específicos.
 
 **Respuesta Exitosa (200 OK):**
@@ -98,127 +152,17 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
         "grado": "5",
         "seccion": "A",
         "docente_id": "docente_01",
-        "fecha_creacion": "...",
-        "fecha_entrega": "...",
-        "estado": "activa",
-        "intentos_permitidos": 2,
-        "preguntas": [
-            {
-                "pregunta_id": "<ID_PREGUNTA_1>",
-                "tipo": "OM",
-                "enunciado": "¿Cuánto es 2 + 2?",
-                "opciones": ["3", "4", "5"],
-                "respuesta_correcta": "4"
-            },
-            "..."
-        ]
+        "..."
     }
 ]
 ```
 
 ---
 
-### 4. Iniciar un Intento de Evaluación
+### 3. Flujo de Intento de Evaluación (Sin cambios)
 
-- **Método:** `POST`
-- **URL:** `/intentos/`
-- **Descripción:** Registra que un alumno ha comenzado a resolver una evaluación.
+Los endpoints para iniciar, finalizar y obtener reportes de intentos no han cambiado.
 
-**Cuerpo (Body) - `raw (JSON)`:**
-```json
-{
-    "evaluacion_id": "<ID_DE_LA_EVALUACION_DEL_PASO_2>",
-    "alumno_id": "alumno_01"
-}
-```
-
-**Respuesta Exitosa (201 Created):**
-```json
-{
-    "intento_id": "<ID_DEL_INTENTO_GENERADO>",
-    "evaluacion_id": "<ID_DE_LA_EVALUACION_DEL_PASO_2>",
-    "alumno_id": "alumno_01",
-    "fecha_inicio": "...",
-    "fecha_fin": null,
-    "calificacion": null,
-    "estado": "en progreso",
-    "respuestas": []
-}
-```
-*(Nota: Guarda el `intento_id` para el siguiente paso.)*
-
----
-
-### 5. Finalizar un Intento de Evaluación
-
-- **Método:** `PUT`
-- **URL:** `/intentos/<ID_DEL_INTENTO_DEL_PASO_4>/finalizar`
-- **Descripción:** Envía las respuestas del alumno, finaliza el intento y calcula la calificación.
-
-**Cuerpo (Body) - `raw (JSON)`:**
-```json
-{
-    "respuestas": [
-        {
-            "pregunta_id": "<ID_PREGUNTA_1>",
-            "opcion_marcada": "4"
-        },
-        {
-            "pregunta_id": "<ID_PREGUNTA_2>",
-            "opcion_marcada": "Falso"
-        }
-    ]
-}
-```
-
-**Respuesta Exitosa (200 OK):**
-```json
-{
-    "msg": "Intento finalizado exitosamente",
-    "calificacion": 20,
-    "intento_id": "<ID_DEL_INTENTO_DEL_PASO_4>"
-}
-```
-
----
-
-### 6. Obtener Reporte del Intento
-
-- **Método:** `POST`
-- **URL:** `/reportes/`
-- **Descripción:** Crea un reporte vacío asociado a un intento (la IA lo llenaría después).
-
-**Cuerpo (Body) - `raw (JSON)`:**
-```json
-{
-    "intento_id": "<ID_DEL_INTENTO_DEL_PASO_4>"
-}
-```
-
-**Respuesta Exitosa (201 Created):**
-```json
-{
-    "reporte_id": "<ID_REPORTE_GENERADO>",
-    "intento_id": "<ID_DEL_INTENTO_DEL_PASO_4>",
-    "diagnostico_ia": null,
-    "recomendaciones_ia": null,
-    "retroalimentacion_docente": null,
-    "fecha_creacion": "..."
-}
-```
-
-- **Método:** `GET`
-- **URL:** `/reportes/intento/<ID_DEL_INTENTO_DEL_PASO_4>`
-- **Descripción:** Obtiene el reporte de un intento específico.
-
-**Respuesta Exitosa (200 OK):**
-```json
-{
-    "reporte_id": "<ID_REPORTE_GENERADO>",
-    "intento_id": "<ID_DEL_INTENTO_DEL_PASO_4>",
-    "diagnostico_ia": null,
-    "recomendaciones_ia": null,
-    "retroalimentacion_docente": null,
-    "fecha_creacion": "..."
-}
-```
+- **Iniciar Intento:** `POST /intentos/`
+- **Finalizar Intento:** `PUT /intentos/<intento_id>/finalizar`
+- **Obtener Reporte:** `GET /reportes/intento/<intento_id>`
