@@ -5,7 +5,7 @@ from datetime import datetime
 
 evaluacion_bp = Blueprint("evaluaciones", __name__)
 
-@evaluacion_bp.route("/", methods=["POST"])
+@evaluacion_bp.route("/crear", methods=["POST"])
 def crear_evaluacion():
     """Crear una nueva evaluación"""
     try:
@@ -55,11 +55,20 @@ def crear_evaluacion():
         return jsonify({"error": str(e)}), 500
 
 
-@evaluacion_bp.route("/", methods=["GET"])
-def listar_evaluaciones():
-    """Listar todas las evaluaciones"""
+@evaluacion_bp.route("/listado", methods=["GET"])
+def listar_evaluaciones_filtradas():
+    """Listar evaluaciones con filtros"""
     try:
-        evaluaciones = Evaluacion.find_all()
+        grado = request.args.get("grado")
+        seccion = request.args.get("seccion")
+
+        filtros = {}
+        if grado:
+            filtros["grado"] = grado
+        if seccion:
+            filtros["seccion"] = seccion
+
+        evaluaciones = Evaluacion.find_by_filters(filtros)
         for evaluacion in evaluaciones:
             if '_id' in evaluacion:
                 evaluacion['_id'] = str(evaluacion['_id'])
@@ -112,19 +121,6 @@ def listar_evaluaciones_docente(docente_id):
     """Listar evaluaciones de un docente específico"""
     try:
         evaluaciones = Evaluacion.find_by_docente(docente_id)
-        for evaluacion in evaluaciones:
-            if '_id' in evaluacion:
-                evaluacion['_id'] = str(evaluacion['_id'])
-        return jsonify(evaluaciones), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@evaluacion_bp.route("/grado/<string:grado>/seccion/<string:seccion>", methods=["GET"])
-def listar_evaluaciones_grado_seccion(grado, seccion):
-    """Listar evaluaciones por grado y sección"""
-    try:
-        evaluaciones = Evaluacion.find_by_grado_seccion(grado, seccion)
         for evaluacion in evaluaciones:
             if '_id' in evaluacion:
                 evaluacion['_id'] = str(evaluacion['_id'])
