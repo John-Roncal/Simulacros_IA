@@ -38,18 +38,17 @@ def crear_alumno():
 def crear_docente():
     try:
         data = request.json
-        required_fields = ["usuario_id", "nombre", "apellido", "correo", "contraseña", "grado", "seccion"]
+        required_fields = ["nombre", "apellido", "correo", "contraseña", "grado", "seccion"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Campo requerido faltante: {field}"}), 400
 
-        if Usuario.find_by_id(data["usuario_id"]) or Usuario.find_by_email(data["correo"]):
-            return jsonify({"error": "Usuario ya existe"}), 400
+        if Usuario.find_by_email(data["correo"]):
+            return jsonify({"error": "Correo electrónico ya registrado"}), 400
 
         password_hash = hashlib.sha256(data["contraseña"].encode()).hexdigest()
         
         nuevo_docente = Usuario(
-            usuario_id=data["usuario_id"],
             nombre=data["nombre"],
             apellido=data["apellido"],
             correo=data["correo"],
@@ -69,18 +68,17 @@ def crear_docente():
 def crear_admin():
     try:
         data = request.json
-        required_fields = ["usuario_id", "nombre", "apellido", "correo", "contraseña"]
+        required_fields = ["nombre", "apellido", "correo", "contraseña"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Campo requerido faltante: {field}"}), 400
 
-        if Usuario.find_by_id(data["usuario_id"]) or Usuario.find_by_email(data["correo"]):
-            return jsonify({"error": "Usuario ya existe"}), 400
+        if Usuario.find_by_email(data["correo"]):
+            return jsonify({"error": "Correo electrónico ya registrado"}), 400
 
         password_hash = hashlib.sha256(data["contraseña"].encode()).hexdigest()
-        
+
         nuevo_admin = Usuario(
-            usuario_id=data["usuario_id"],
             nombre=data["nombre"],
             apellido=data["apellido"],
             correo=data["correo"],
@@ -154,7 +152,7 @@ def listar_docentes():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@usuario_bp.route("/docentes/<string:usuario_id>", methods=["GET"])
+@usuario_bp.route("/docentes/<int:usuario_id>", methods=["GET"])
 def obtener_docente(usuario_id):
     try:
         docente = Usuario.find_by_id(usuario_id)
@@ -166,7 +164,7 @@ def obtener_docente(usuario_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@usuario_bp.route("/docentes/<string:usuario_id>", methods=["PUT"])
+@usuario_bp.route("/docentes/<int:usuario_id>", methods=["PUT"])
 def actualizar_docente(usuario_id):
     try:
         data = request.json
@@ -181,7 +179,7 @@ def actualizar_docente(usuario_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@usuario_bp.route("/docentes/<string:usuario_id>", methods=["DELETE"])
+@usuario_bp.route("/docentes/<int:usuario_id>", methods=["DELETE"])
 def anular_docente(usuario_id):
     try:
         result = Usuario.update_by_id(usuario_id, {"estado": "inactivo"})
@@ -203,7 +201,7 @@ def listar_admins():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@usuario_bp.route("/admins/<string:usuario_id>", methods=["GET"])
+@usuario_bp.route("/admins/<int:usuario_id>", methods=["GET"])
 def obtener_admin(usuario_id):
     try:
         admin = Usuario.find_by_id(usuario_id)
@@ -215,7 +213,7 @@ def obtener_admin(usuario_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@usuario_bp.route("/admins/<string:usuario_id>", methods=["PUT"])
+@usuario_bp.route("/admins/<int:usuario_id>", methods=["PUT"])
 def actualizar_admin(usuario_id):
     try:
         data = request.json
@@ -230,7 +228,7 @@ def actualizar_admin(usuario_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
-@usuario_bp.route("/admins/<string:usuario_id>", methods=["DELETE"])
+@usuario_bp.route("/admins/<int:usuario_id>", methods=["DELETE"])
 def anular_admin(usuario_id):
     try:
         result = Usuario.update_by_id(usuario_id, {"estado": "inactivo"})

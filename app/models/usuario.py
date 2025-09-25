@@ -23,9 +23,9 @@ class Usuario:
 
     def save(self):
         """Guardar usuario en MongoDB"""
-        # Generar usuario_id incremental si es Alumno y no se proporciona
-        if self.rol == "Alumno" and self.usuario_id is None:
-            self.usuario_id = self.get_next_student_id()
+        # Generar usuario_id incremental si no se proporciona
+        if self.usuario_id is None:
+            self.usuario_id = self.get_next_user_id()
 
         usuario_data = {
             "usuario_id": self.usuario_id,
@@ -45,14 +45,18 @@ class Usuario:
         return result
 
     @staticmethod
-    def get_next_student_id():
-        """Obtener el siguiente ID de estudiante disponible"""
-        last_student = app.db.usuarios.find_one(
-            {"rol": "Alumno"},
+    def get_next_user_id():
+        """Obtener el siguiente ID de usuario numérico disponible."""
+        # Find the user with the highest numerical usuario_id.
+        # We query for numeric types to be robust against old string-based IDs.
+        last_user = app.db.usuarios.find_one(
+            {"usuario_id": {"$type": ["double", "int", "long"]}},
             sort=[("usuario_id", -1)]
         )
-        if last_student and isinstance(last_student.get("usuario_id"), int):
-            return last_student["usuario_id"] + 1
+        if last_user and isinstance(last_user.get("usuario_id"), (int, float)):
+            return int(last_user["usuario_id"]) + 1
+
+        # If no numerical user ID is found, start from 1.
         return 1
 
     @staticmethod
@@ -67,8 +71,8 @@ class Usuario:
 
     @staticmethod
     def find_by_role(rol):
-        """Buscar usuarios por rol"""
-        return list(app.db.usuarios.find({"rol": rol}))
+        """Buscar usuarios activos por rol"""
+        return list(app.db.usuarios.find({"rol": rol, "estado": "activo"}))
     
     @staticmethod
     def find_by_email(correo):

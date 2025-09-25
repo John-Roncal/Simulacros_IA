@@ -40,12 +40,11 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
 
 - **Método:** `POST`
 - **URL:** `/usuarios/crear/docente`
-- **Descripción:** Registra un nuevo docente. Puede tener múltiples grados y secciones.
+- **Descripción:** Registra un nuevo docente. El `usuario_id` es autoincremental.
 
 **Cuerpo (Body) - `raw (JSON)`:**
 ```json
 {
-    "usuario_id": "docente_01",
     "nombre": "Maria",
     "apellido": "Gonzalez",
     "correo": "maria.gonzalez@email.com",
@@ -59,7 +58,7 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
 ```json
 {
     "msg": "Docente creado exitosamente",
-    "usuario_id": "docente_01"
+    "usuario_id": 2
 }
 ```
 
@@ -67,12 +66,11 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
 
 - **Método:** `POST`
 - **URL:** `/usuarios/crear/admin`
-- **Descripción:** Registra un nuevo administrador.
+- **Descripción:** Registra un nuevo administrador. El `usuario_id` es autoincremental.
 
 **Cuerpo (Body) - `raw (JSON)`:**
 ```json
 {
-    "usuario_id": "admin_01",
     "nombre": "Admin",
     "apellido": "Principal",
     "correo": "admin@email.com",
@@ -84,7 +82,7 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
 ```json
 {
     "msg": "Admin creado exitosamente",
-    "usuario_id": "admin_01"
+    "usuario_id": 3
 }
 ```
 
@@ -95,7 +93,7 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
 - **Actualizar Alumno:** `PUT /usuarios/alumnos/<usuario_id>`
 - **Anular Alumno:** `DELETE /usuarios/alumnos/<usuario_id>`
 
-*(Lo mismo aplica para `/docentes` y `/admins`)*
+*(Lo mismo aplica para `/docentes` y `/admins`. El `<usuario_id>` será numérico para todos.)*
 
 ---
 
@@ -114,7 +112,7 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
     "materia": "Matemáticas",
     "grado": "5",
     "seccion": "A",
-    "docente_id": "docente_01",
+    "docente_id": "2",
     "fecha_entrega": "2025-10-15T23:59:59",
     "intentos_permitidos": 2,
     "preguntas": [
@@ -151,7 +149,7 @@ Esta guía describe cómo probar los endpoints clave del backend para el flujo p
         "materia": "Matemáticas",
         "grado": "5",
         "seccion": "A",
-        "docente_id": "docente_01",
+        "docente_id": "2",
         "..."
     }
 ]
