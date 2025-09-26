@@ -47,7 +47,7 @@ def finalizar_intento(intento_id):
             return jsonify({"error": "Evaluación asociada no encontrada"}), 404
         
         # Crear un mapa de pregunta_id -> respuesta_correcta para una búsqueda fácil
-        mapa_respuestas_correctas = {p["pregunta_id"]: p["respuesta_correcta"] for p in evaluacion["preguntas"]}
+        mapa_respuestas_correctas = {p["pregunta_id"]: p["respuesta_correcta"] for p in evaluacion["preguntas"] if "pregunta_id" in p}
 
         respuestas_obj = []
         respuestas_correctas = 0
