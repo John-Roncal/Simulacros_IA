@@ -1,6 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from app.models.usuario import Usuario
-import hashlib
+import bcrypt
+import jwt
+from datetime import datetime, timedelta, timezone
 
 usuario_bp = Blueprint("usuarios", __name__)
 
@@ -16,13 +18,13 @@ def crear_alumno():
         if Usuario.find_by_email(data["correo"]):
             return jsonify({"error": "Correo electrónico ya registrado"}), 400
 
-        password_hash = hashlib.sha256(data["contraseña"].encode()).hexdigest()
+        hashed_password = bcrypt.hashpw(data["contraseña"].encode('utf-8'), bcrypt.gensalt())
 
         nuevo_alumno = Usuario(
             nombre=data["nombre"],
             apellido=data["apellido"],
             correo=data["correo"],
-            contraseña_hash=password_hash,
+            contraseña_hash=hashed_password,
             rol="Alumno",
             grado=data["grado"],
             seccion=data["seccion"]
@@ -46,13 +48,13 @@ def crear_docente():
         if Usuario.find_by_email(data["correo"]):
             return jsonify({"error": "Correo electrónico ya registrado"}), 400
 
-        password_hash = hashlib.sha256(data["contraseña"].encode()).hexdigest()
+        hashed_password = bcrypt.hashpw(data["contraseña"].encode('utf-8'), bcrypt.gensalt())
         
         nuevo_docente = Usuario(
             nombre=data["nombre"],
             apellido=data["apellido"],
             correo=data["correo"],
-            contraseña_hash=password_hash,
+            contraseña_hash=hashed_password,
             rol="Docente",
             grado=data["grado"],
             seccion=data["seccion"]
@@ -76,13 +78,13 @@ def crear_admin():
         if Usuario.find_by_email(data["correo"]):
             return jsonify({"error": "Correo electrónico ya registrado"}), 400
 
-        password_hash = hashlib.sha256(data["contraseña"].encode()).hexdigest()
+        hashed_password = bcrypt.hashpw(data["contraseña"].encode('utf-8'), bcrypt.gensalt())
 
         nuevo_admin = Usuario(
             nombre=data["nombre"],
             apellido=data["apellido"],
             correo=data["correo"],
-            contraseña_hash=password_hash,
+            contraseña_hash=hashed_password,
             rol="Admin"
         )
 
@@ -92,14 +94,37 @@ def crear_admin():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+@usuario_bp.route("/login", methods=["POST"])
+def login():
+    try:
+        data = request.json
+        correo = data.get("correo")
+        contraseña = data.get("contraseña")
+
+        if not correo or not contraseña:
+            return jsonify({"error": "Correo y contraseña son requeridos"}), 400
+
+        usuario = Usuario.find_by_email(correo)
+
+        if not usuario or not bcrypt.checkpw(contraseña.encode('utf-8'), usuario.contraseña_hash):
+            return jsonify({"error": "Credenciales inválidas"}), 401
+
+        token = jwt.encode({
+            'usuario_id': usuario.usuario_id,
+            'rol': usuario.rol,
+            'exp': datetime.now(timezone.utc) + timedelta(hours=24)
+        }, current_app.config['SECRET_KEY'], algorithm="HS256")
+
+        return jsonify({'token': token, 'rol': usuario.rol})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @usuario_bp.route("/alumnos", methods=["GET"])
 def listar_alumnos():
     try:
         alumnos = Usuario.find_by_role("Alumno")
-        for alumno in alumnos:
-            if '_id' in alumno:
-                alumno['_id'] = str(alumno['_id'])
-        return jsonify(alumnos), 200
+        return jsonify([alumno.to_json() for alumno in alumnos]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -107,11 +132,9 @@ def listar_alumnos():
 def obtener_alumno(usuario_id):
     try:
         alumno = Usuario.find_by_id(usuario_id)
-        if not alumno or alumno['rol'] != 'Alumno':
+        if not alumno or alumno.rol != 'Alumno':
             return jsonify({"error": "Alumno no encontrado"}), 404
-        if '_id' in alumno:
-            alumno['_id'] = str(alumno['_id'])
-        return jsonify(alumno), 200
+        return jsonify(alumno.to_json()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -120,7 +143,7 @@ def actualizar_alumno(usuario_id):
     try:
         data = request.json
         if "contraseña" in data:
-            data["contraseña_hash"] = hashlib.sha256(data["contraseña"].encode()).hexdigest()
+            data["contraseña_hash"] = bcrypt.hashpw(data["contraseña"].encode('utf-8'), bcrypt.gensalt())
             del data["contraseña"]
         
         result = Usuario.update_by_id(usuario_id, data)
@@ -145,10 +168,7 @@ def anular_alumno(usuario_id):
 def listar_docentes():
     try:
         docentes = Usuario.find_by_role("Docente")
-        for docente in docentes:
-            if '_id' in docente:
-                docente['_id'] = str(docente['_id'])
-        return jsonify(docentes), 200
+        return jsonify([docente.to_json() for docente in docentes]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -156,11 +176,9 @@ def listar_docentes():
 def obtener_docente(usuario_id):
     try:
         docente = Usuario.find_by_id(usuario_id)
-        if not docente or docente['rol'] != 'Docente':
+        if not docente or docente.rol != 'Docente':
             return jsonify({"error": "Docente no encontrado"}), 404
-        if '_id' in docente:
-            docente['_id'] = str(docente['_id'])
-        return jsonify(docente), 200
+        return jsonify(docente.to_json()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -169,7 +187,7 @@ def actualizar_docente(usuario_id):
     try:
         data = request.json
         if "contraseña" in data:
-            data["contraseña_hash"] = hashlib.sha256(data["contraseña"].encode()).hexdigest()
+            data["contraseña_hash"] = bcrypt.hashpw(data["contraseña"].encode('utf-8'), bcrypt.gensalt())
             del data["contraseña"]
         
         result = Usuario.update_by_id(usuario_id, data)
@@ -194,10 +212,7 @@ def anular_docente(usuario_id):
 def listar_admins():
     try:
         admins = Usuario.find_by_role("Admin")
-        for admin in admins:
-            if '_id' in admin:
-                admin['_id'] = str(admin['_id'])
-        return jsonify(admins), 200
+        return jsonify([admin.to_json() for admin in admins]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -205,11 +220,9 @@ def listar_admins():
 def obtener_admin(usuario_id):
     try:
         admin = Usuario.find_by_id(usuario_id)
-        if not admin or admin['rol'] != 'Admin':
+        if not admin or admin.rol != 'Admin':
             return jsonify({"error": "Admin no encontrado"}), 404
-        if '_id' in admin:
-            admin['_id'] = str(admin['_id'])
-        return jsonify(admin), 200
+        return jsonify(admin.to_json()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -218,7 +231,7 @@ def actualizar_admin(usuario_id):
     try:
         data = request.json
         if "contraseña" in data:
-            data["contraseña_hash"] = hashlib.sha256(data["contraseña"].encode()).hexdigest()
+            data["contraseña_hash"] = bcrypt.hashpw(data["contraseña"].encode('utf-8'), bcrypt.gensalt())
             del data["contraseña"]
         
         result = Usuario.update_by_id(usuario_id, data)
