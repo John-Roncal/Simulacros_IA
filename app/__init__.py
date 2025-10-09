@@ -32,11 +32,11 @@ def create_app():
         if db.grados.count_documents({}) == 0:
             print("📚 Poblando la base de datos con los grados iniciales...")
             grados_iniciales = [
-                {"nombre": "Primero", "descripcion": "Primer grado de secundaria"},
-                {"nombre": "Segundo", "descripcion": "Segundo grado de secundaria"},
-                {"nombre": "Tercero", "descripcion": "Tercer grado de secundaria"},
-                {"nombre": "Cuarto", "descripcion": "Cuarto grado de secundaria"},
-                {"nombre": "Quinto", "descripcion": "Quinto grado de secundaria"}
+                {"nombre": "1°", "descripcion": "Primer grado de secundaria"},
+                {"nombre": "2°", "descripcion": "Segundo grado de secundaria"},
+                {"nombre": "3°", "descripcion": "Tercer grado de secundaria"},
+                {"nombre": "4°", "descripcion": "Cuarto grado de secundaria"},
+                {"nombre": "5°", "descripcion": "Quinto grado de secundaria"}
             ]
             for grado_data in grados_iniciales:
                 grado = Grado(nombre=grado_data["nombre"], descripcion=grado_data["descripcion"], estado=True)
