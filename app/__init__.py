@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from flask_cors import CORS
 import os
 import certifi
+from .models.grado import Grado
 
 # Variable global para la conexión a MongoDB
 db_client = None
@@ -14,6 +15,7 @@ def create_app():
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": ["http://localhost:4200","http://127.0.0.1:4200"]}})
     app.config['JSON_AS_ASCII'] = False
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-super-secret-key')
 
     # Configuración MongoDB Atlas
     mongo_uri = "mongodb+srv://admin:jW0DwZFZuWsTxXym@alberteinstein.lftfvkl.mongodb.net/plataforma_simulacros?retryWrites=true&w=majority&appName=AlbertEinstein"
@@ -25,6 +27,22 @@ def create_app():
         # Verificar conexión
         db_client.admin.command('ping')
         print("✅ Conexión exitosa a MongoDB Atlas")
+
+        # Poblar grados si la colección está vacía
+        if db.grados.count_documents({}) == 0:
+            print("📚 Poblando la base de datos con los grados iniciales...")
+            grados_iniciales = [
+                {"nombre": "Primero", "descripcion": "Primer grado de secundaria"},
+                {"nombre": "Segundo", "descripcion": "Segundo grado de secundaria"},
+                {"nombre": "Tercero", "descripcion": "Tercer grado de secundaria"},
+                {"nombre": "Cuarto", "descripcion": "Cuarto grado de secundaria"},
+                {"nombre": "Quinto", "descripcion": "Quinto grado de secundaria"}
+            ]
+            for grado_data in grados_iniciales:
+                grado = Grado(nombre=grado_data["nombre"], descripcion=grado_data["descripcion"], estado=True)
+                db.grados.insert_one(grado.to_dict())
+            print("✅ Grados iniciales poblados exitosamente.")
+
     except Exception as e:
         print(f"❌ Error conectando a MongoDB: {e}")
         print("La aplicación continuará sin base de datos")

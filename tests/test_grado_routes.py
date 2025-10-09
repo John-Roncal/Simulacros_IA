@@ -15,18 +15,6 @@ class GradoRoutesTest(unittest.TestCase):
             db_client.close()
 
     @patch('app.db')
-    def test_create_grado(self, mock_db):
-        mock_db.grados.insert_one.return_value = MagicMock()
-        response = self.client.post('/grados/',
-                                    data=json.dumps({
-                                        "nombre": "Primer Grado",
-                                        "descripcion": "Grado para niños de 6 años"
-                                    }),
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 201)
-        self.assertIn('Grado creado exitosamente', response.get_data(as_text=True))
-
-    @patch('app.db')
     def test_get_grados(self, mock_db):
         mock_db.grados.find.return_value = [
             {

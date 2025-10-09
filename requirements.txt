@@ -16,3 +16,5 @@ mongoengine==0.29.1
 pymongo==4.15.0
 Werkzeug==2.2.2
 WTForms==3.2.1
+PyJWT==2.8.0
+bcrypt==4.1.2
