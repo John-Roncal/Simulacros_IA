@@ -13,6 +13,7 @@ def create_app():
     
     app = Flask(__name__)
     CORS(app, resources={r"/*": {"origins": ["http://localhost:4200","http://127.0.0.1:4200"]}})
+    app.config['JSON_AS_ASCII'] = False
 
     # Configuración MongoDB Atlas
     mongo_uri = "mongodb+srv://admin:jW0DwZFZuWsTxXym@alberteinstein.lftfvkl.mongodb.net/plataforma_simulacros?retryWrites=true&w=majority&appName=AlbertEinstein"
@@ -34,6 +35,8 @@ def create_app():
     from .routes.intento_routes import intento_bp
     from .routes.reporte_routes import reporte_bp
     from .routes.notificacion_routes import notificacion_bp
+    from .routes.grado_routes import grado_bp
+    from .routes.seccion_routes import seccion_bp
 
     # Registrar Blueprints
     app.register_blueprint(usuario_bp, url_prefix="/usuarios")
@@ -41,5 +44,7 @@ def create_app():
     app.register_blueprint(intento_bp, url_prefix="/intentos")
     app.register_blueprint(reporte_bp, url_prefix="/reportes")
     app.register_blueprint(notificacion_bp, url_prefix="/notificaciones")
+    app.register_blueprint(grado_bp, url_prefix="/grados")
+    app.register_blueprint(seccion_bp, url_prefix="/secciones")
 
     return app
