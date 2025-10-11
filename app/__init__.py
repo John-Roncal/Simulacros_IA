@@ -24,13 +24,13 @@ def create_app():
         ca = certifi.where()
         db_client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000, tlsCAFile=ca)
         db = db_client.plataforma_simulacros
+        app.db = db  # Hacer la base de datos accesible desde app
         # Verificar conexión
         db_client.admin.command('ping')
         print("✅ Conexión exitosa a MongoDB Atlas")
 
         # Poblar grados si la colección está vacía
         if db.grados.count_documents({}) == 0:
-            print("📚 Poblando la base de datos con los grados iniciales...")
             grados_iniciales = [
                 {"nombre": "1°", "descripcion": "Primer grado de secundaria"},
                 {"nombre": "2°", "descripcion": "Segundo grado de secundaria"},
@@ -42,7 +42,6 @@ def create_app():
                 grado = Grado(nombre=grado_data["nombre"], descripcion=grado_data["descripcion"], estado=True)
                 db.grados.insert_one(grado.to_dict())
             print("✅ Grados iniciales poblados exitosamente.")
-
     except Exception as e:
         print(f"❌ Error conectando a MongoDB: {e}")
         print("La aplicación continuará sin base de datos")
