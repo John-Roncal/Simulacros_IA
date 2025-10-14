@@ -4,7 +4,7 @@ import uuid
 
 reporte_bp = Blueprint("reportes", __name__)
 
-@reporte_bp.route("/", methods=["POST"])
+@reporte_bp.route("", methods=["POST"])
 def crear_reporte():
     """Crea un nuevo reporte, usualmente después de finalizar un intento."""
     try:

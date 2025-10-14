@@ -5,7 +5,7 @@ from bson.objectid import ObjectId
 
 seccion_bp = Blueprint('seccion_bp', __name__)
 
-@seccion_bp.route('/', methods=['POST'])
+@seccion_bp.route('', methods=['POST'])
 def create_seccion():
     data = request.get_json() or {}
     # convertir grado_id a ObjectId si viene como string

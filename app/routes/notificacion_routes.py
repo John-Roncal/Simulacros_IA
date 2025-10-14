@@ -4,7 +4,7 @@ import uuid
 
 notificacion_bp = Blueprint('notificaciones', __name__)
 
-@notificacion_bp.route('/', methods=['POST'])
+@notificacion_bp.route('', methods=['POST'])
 def crear_notificacion():
     """Crea una nueva notificación."""
     data = request.get_json()

@@ -6,7 +6,7 @@ from datetime import datetime
 
 intento_bp = Blueprint("intentos", __name__)
 
-@intento_bp.route("/", methods=["POST"])
+@intento_bp.route("", methods=["POST"])
 def crear_intento():
     """Crea un nuevo intento para una evaluación."""
     try:
