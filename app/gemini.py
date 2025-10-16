@@ -10,7 +10,7 @@ if not gemini_api_key:
 genai.configure(api_key=gemini_api_key)
 
 # Crear el modelo generativo
-model = genai.GenerativeModel('gemini-1.5-pro-latest')
+model = genai.GenerativeModel('gemini-2.5-pro')
 
 def generar_feedback_ia(prompt):
     """
