@@ -115,7 +115,7 @@ def login():
             'exp': datetime.now(timezone.utc) + timedelta(hours=24)
         }, current_app.config['SECRET_KEY'], algorithm="HS256")
 
-        return jsonify({'token': token, 'rol': usuario.rol})
+        return jsonify({'token': token, 'rol': usuario.rol, 'usuario_id': usuario.usuario_id}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
