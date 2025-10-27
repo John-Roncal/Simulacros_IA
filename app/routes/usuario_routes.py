@@ -127,6 +127,16 @@ def listar_alumnos():
         return jsonify([alumno.to_json() for alumno in alumnos]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+    
+@usuario_bp.route("/<int:usuario_id>", methods=["GET"])
+def obtener_usuario(usuario_id):
+    try:
+        usuario = Usuario.find_by_id(usuario_id)
+        if not usuario:
+            return jsonify({"error": "Usuario no encontrado"}), 404
+        return jsonify(usuario.to_json()), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
 
 @usuario_bp.route("/alumnos/<int:usuario_id>", methods=["GET"])
 def obtener_alumno(usuario_id):
