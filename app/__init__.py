@@ -54,9 +54,11 @@ def create_app():
     from .routes.notificacion_routes import notificacion_bp
     from .routes.grado_routes import grado_bp
     from .routes.seccion_routes import seccion_bp
+    from .routes.dashboard_routes import dashboard_bp
 
     # Registrar Blueprints
     app.register_blueprint(usuario_bp, url_prefix="/usuarios")
+    app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
     app.register_blueprint(evaluacion_bp, url_prefix="/evaluaciones")
     app.register_blueprint(intento_bp, url_prefix="/intentos")
     app.register_blueprint(reporte_bp, url_prefix="/reportes")
