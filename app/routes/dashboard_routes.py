@@ -15,7 +15,9 @@ def get_summary():
         salones_activos = set()
         for alumno in alumnos:
             if alumno.grado and alumno.seccion:
-                salones_activos.add((alumno.grado, alumno.seccion))
+                grado = alumno.grado[0] if isinstance(alumno.grado, list) else alumno.grado
+                seccion = alumno.seccion[0] if isinstance(alumno.seccion, list) else alumno.seccion
+                salones_activos.add((grado, seccion))
 
         total_salones_activos = len(salones_activos)
 
