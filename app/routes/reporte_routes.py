@@ -82,18 +82,18 @@ def agregar_retroalimentacion_docente(reporte_id):
         return jsonify({"msg": "Retroalimentación agregada exitosamente"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+    
 @reporte_bp.route("/semanal/alumno/<int:alumno_id>", methods=["GET"])
 def generar_reporte_semanal_alumno(alumno_id):
-    """Genera y devuelve un reporte semanal de notas para un alumno en formato PDF."""
+    """Genera y devuelve un reporte general de notas para un alumno en formato PDF."""
     try:
         # Validar que el alumno exista
         alumno = Usuario.find_by_id(alumno_id)
         if not alumno or alumno.rol != "Alumno":
             return jsonify({"error": "Alumno no encontrado"}), 404
 
-        # Buscar todos los intentos del alumno
-        intentos = Intento.find_by_alumno(alumno_id)
+        # Buscar todos los intentos del alumno (convertir a string)
+        intentos = Intento.find_by_alumno(str(alumno_id))
 
         if not intentos:
             return jsonify({"error": "No se encontraron intentos para este alumno"}), 404
@@ -101,16 +101,28 @@ def generar_reporte_semanal_alumno(alumno_id):
         # Procesar los datos para el reporte
         notas_por_materia = {}
         for intento in intentos:
+            # Solo procesar intentos finalizados con calificación
+            if intento.get("estado") != "finalizado" or intento.get("calificacion") is None:
+                continue
+                
             evaluacion = Evaluacion.find_by_id(intento["evaluacion_id"])
             if evaluacion:
                 materia = evaluacion["materia"]
                 calificacion = intento["calificacion"]
+                
                 if materia not in notas_por_materia:
                     notas_por_materia[materia] = []
                 notas_por_materia[materia].append(calificacion)
 
-        # Calcular promedios
-        promedios_por_materia = {materia: sum(notas) / len(notas) for materia, notas in notas_por_materia.items()}
+        # Verificar que haya calificaciones válidas
+        if not notas_por_materia:
+            return jsonify({"error": "No se encontraron calificaciones finalizadas para este alumno"}), 404
+
+        # Calcular promedios (ahora seguro que todas las notas son números válidos)
+        promedios_por_materia = {
+            materia: round(sum(notas) / len(notas), 2) 
+            for materia, notas in notas_por_materia.items()
+        }
 
         # Generar el PDF
         pdf_buffer = generar_pdf_reporte(alumno, promedios_por_materia)
@@ -123,6 +135,7 @@ def generar_reporte_semanal_alumno(alumno_id):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 def generar_pdf_reporte(alumno, promedios):
     """Genera un reporte en PDF y lo devuelve como un buffer de bytes."""
@@ -151,8 +164,8 @@ def generar_pdf_reporte(alumno, promedios):
         pdf.cell(50, 10, f"{promedio:.2f}", 1)
         pdf.ln()
 
-    # Convertir a buffer de bytes
-    buffer = io.BytesIO()
-    pdf.output(buffer)
+    # Convertir a buffer de bytes usando dest='S' para obtener string de bytes
+    pdf_bytes = pdf.output(dest='S').encode('latin-1')
+    buffer = io.BytesIO(pdf_bytes)
     buffer.seek(0)
     return buffer
