@@ -74,6 +74,19 @@ class Intento:
         if db is None:
             return []
         return list(db.intentos.find({"alumno_id": alumno_id}))
+
+    @staticmethod
+    def find_by_alumno_in_date_range(alumno_id, fecha_inicio, fecha_fin):
+        """Buscar intentos de un alumno en un rango de fechas."""
+        if db is None:
+            return []
+        return list(db.intentos.find({
+            "alumno_id": alumno_id,
+            "fecha_inicio": {
+                "$gte": fecha_inicio,
+                "$lt": fecha_fin
+            }
+        }))
     
     @staticmethod
     def find_by_evaluacion(evaluacion_id):
