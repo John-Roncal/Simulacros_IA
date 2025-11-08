@@ -3,7 +3,7 @@ from app.models.reporte import Reporte
 from app.models.intento import Intento
 from app.models.evaluacion import Evaluacion
 from app.models.usuario import Usuario
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import uuid
 from fpdf import FPDF
 import io
@@ -83,7 +83,7 @@ def agregar_retroalimentacion_docente(reporte_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@reporte_bp.route("/semanal/alumno/<string:alumno_id>", methods=["GET"])
+@reporte_bp.route("/semanal/alumno/<int:alumno_id>", methods=["GET"])
 def generar_reporte_semanal_alumno(alumno_id):
     """Genera y devuelve un reporte semanal de notas para un alumno en formato PDF."""
     try:
@@ -92,15 +92,11 @@ def generar_reporte_semanal_alumno(alumno_id):
         if not alumno or alumno.rol != "Alumno":
             return jsonify({"error": "Alumno no encontrado"}), 404
 
-        # Obtener la fecha de inicio y fin de la última semana
-        fecha_fin = datetime.utcnow()
-        fecha_inicio = fecha_fin - timedelta(days=7)
-
-        # Buscar todos los intentos del alumno en la última semana
-        intentos = Intento.find_by_alumno_in_date_range(alumno_id, fecha_inicio, fecha_fin)
+        # Buscar todos los intentos del alumno
+        intentos = Intento.find_by_alumno(alumno_id)
 
         if not intentos:
-            return jsonify({"error": "No se encontraron intentos para este alumno en la última semana"}), 404
+            return jsonify({"error": "No se encontraron intentos para este alumno"}), 404
 
         # Procesar los datos para el reporte
         notas_por_materia = {}
@@ -117,31 +113,30 @@ def generar_reporte_semanal_alumno(alumno_id):
         promedios_por_materia = {materia: sum(notas) / len(notas) for materia, notas in notas_por_materia.items()}
 
         # Generar el PDF
-        pdf_buffer = generar_pdf_reporte(alumno, promedios_por_materia, fecha_inicio, fecha_fin)
+        pdf_buffer = generar_pdf_reporte(alumno, promedios_por_materia)
 
         # Devolver el PDF como respuesta
         response = make_response(pdf_buffer.getvalue())
         response.headers["Content-Type"] = "application/pdf"
-        response.headers["Content-Disposition"] = f"attachment; filename=reporte_semanal_{alumno_id}.pdf"
+        response.headers["Content-Disposition"] = f"attachment; filename=reporte_general_{alumno_id}.pdf"
         return response
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def generar_pdf_reporte(alumno, promedios, fecha_inicio, fecha_fin):
+def generar_pdf_reporte(alumno, promedios):
     """Genera un reporte en PDF y lo devuelve como un buffer de bytes."""
     pdf = FPDF()
     pdf.add_page()
 
     # Título
     pdf.set_font("Arial", "B", 16)
-    pdf.cell(0, 10, "Reporte Semanal de Calificaciones", 0, 1, "C")
+    pdf.cell(0, 10, "Reporte General de Calificaciones", 0, 1, "C")
     pdf.ln(10)
 
     # Información del alumno
     pdf.set_font("Arial", "", 12)
     pdf.cell(0, 10, f"Alumno: {alumno.nombre} {alumno.apellido}", 0, 1)
-    pdf.cell(0, 10, f"Semana del {fecha_inicio.strftime('%d/%m/%Y')} al {fecha_fin.strftime('%d/%m/%Y')}", 0, 1)
     pdf.ln(10)
 
     # Tabla de promedios
