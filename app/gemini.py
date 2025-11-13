@@ -8,7 +8,7 @@ if not gemini_api_key:
 
 genai.configure(api_key=gemini_api_key)
 
-model = genai.GenerativeModel('gemini-2.5-pro')
+model = genai.GenerativeModel('gemini-2.5-flash') #A ver si con este es más rápido jeje :v
 
 def generar_feedback_ia(prompt):
     try:
