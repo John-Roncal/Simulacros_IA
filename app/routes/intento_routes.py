@@ -18,12 +18,26 @@ def crear_intento():
         if not all(field in data for field in required_fields):
             return jsonify({"error": "Campos requeridos faltantes: evaluacion_id, alumno_id"}), 400
 
+        evaluacion_id = data["evaluacion_id"]
+        alumno_id = data["alumno_id"]
+
+        # Validar intentos permitidos
+        evaluacion = Evaluacion.find_by_id(evaluacion_id)
+        if not evaluacion:
+            return jsonify({"error": "Evaluación no encontrada"}), 404
+
+        intentos_permitidos = evaluacion.get("intentos_permitidos", 1)
+        intentos_realizados = len(Intento.find_by_evaluacion_and_alumno(evaluacion_id, alumno_id))
+
+        if intentos_realizados >= intentos_permitidos:
+            return jsonify({"error": "Se ha excedido el número de intentos permitidos"}), 403
+
         # Crear el intento inicial (sin respuestas)
         intento_id = str(uuid.uuid4())
         nuevo_intento = Intento(
             intento_id=intento_id,
-            evaluacion_id=data["evaluacion_id"],
-            alumno_id=data["alumno_id"]
+            evaluacion_id=evaluacion_id,
+            alumno_id=alumno_id
         )
 
         nuevo_intento.save()

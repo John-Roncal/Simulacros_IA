@@ -94,6 +94,13 @@ class Intento:
         if db is None:
             return []
         return list(db.intentos.find({"evaluacion_id": evaluacion_id}))
+
+    @staticmethod
+    def find_by_evaluacion_and_alumno(evaluacion_id, alumno_id):
+        """Buscar intentos por evaluación y alumno"""
+        if db is None:
+            return []
+        return list(db.intentos.find({"evaluacion_id": evaluacion_id, "alumno_id": alumno_id}))
     
     @staticmethod
     def update_by_id(intento_id, update_data):
