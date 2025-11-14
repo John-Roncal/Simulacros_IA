@@ -123,7 +123,14 @@ def login():
 @usuario_bp.route("/alumnos", methods=["GET"])
 def listar_alumnos():
     try:
-        alumnos = Usuario.find_by_role("Alumno")
+        grado = request.args.get("grado")
+        seccion = request.args.get("seccion")
+
+        if grado and seccion:
+            alumnos = Usuario.find_alumnos_by_grado_and_seccion(grado, seccion)
+        else:
+            alumnos = Usuario.find_by_role("Alumno")
+
         return jsonify([alumno.to_json() for alumno in alumnos]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400

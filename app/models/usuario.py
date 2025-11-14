@@ -104,6 +104,16 @@ class Usuario:
             "seccion": seccion
         }
         return [Usuario.from_mongo(user_data) for user_data in app.db.usuarios.find(query)]
+
+    @staticmethod
+    def find_alumnos_by_grado_and_seccion(grado, seccion):
+        query = {
+            "rol": "Alumno",
+            "estado": "activo",
+            "grado": grado,
+            "seccion": seccion
+        }
+        return [Usuario.from_mongo(user_data) for user_data in app.db.usuarios.find(query)]
     
     @staticmethod
     def find_by_email(correo):
