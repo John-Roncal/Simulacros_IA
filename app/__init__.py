@@ -55,6 +55,7 @@ def create_app():
     from .routes.grado_routes import grado_bp
     from .routes.seccion_routes import seccion_bp
     from .routes.dashboard_routes import dashboard_bp
+    from .routes.materia_routes import materia_bp
 
     # Registrar Blueprints
     app.register_blueprint(usuario_bp, url_prefix="/usuarios")
@@ -65,5 +66,6 @@ def create_app():
     app.register_blueprint(notificacion_bp, url_prefix="/notificaciones")
     app.register_blueprint(grado_bp, url_prefix="/grados")
     app.register_blueprint(seccion_bp, url_prefix="/secciones")
+    app.register_blueprint(materia_bp, url_prefix="/materias")
 
     return app
