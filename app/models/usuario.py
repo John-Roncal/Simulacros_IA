@@ -94,6 +94,16 @@ class Usuario:
     @staticmethod
     def find_by_role(rol):
         return [Usuario.from_mongo(user_data) for user_data in app.db.usuarios.find({"rol": rol, "estado": "activo"})]
+
+    @staticmethod
+    def find_by_grado_and_seccion(grado, seccion):
+        query = {
+            "rol": "Docente",
+            "estado": "activo",
+            "grado": grado,
+            "seccion": seccion
+        }
+        return [Usuario.from_mongo(user_data) for user_data in app.db.usuarios.find(query)]
     
     @staticmethod
     def find_by_email(correo):

@@ -177,7 +177,14 @@ def anular_alumno(usuario_id):
 @usuario_bp.route("/docentes", methods=["GET"])
 def listar_docentes():
     try:
-        docentes = Usuario.find_by_role("Docente")
+        grado = request.args.get("grado")
+        seccion = request.args.get("seccion")
+
+        if grado and seccion:
+            docentes = Usuario.find_by_grado_and_seccion(grado, seccion)
+        else:
+            docentes = Usuario.find_by_role("Docente")
+
         return jsonify([docente.to_json() for docente in docentes]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
