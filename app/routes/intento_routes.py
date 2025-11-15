@@ -167,7 +167,15 @@ def finalizar_intento(intento_id):
             "feedback_docente": feedback_docente_general
         }
 
-        Intento.update_by_id(intento_id, update_data)
+        try:
+            result = Intento.update_by_id(intento_id, update_data)
+            if result.matched_count == 0:
+                return jsonify({"error": "No se encontró el intento para actualizar"}), 404
+            if result.modified_count == 0:
+                print("Advertencia: No se modificó ningún documento, los datos pueden ser los mismos.")
+        except Exception as e:
+            print(f"Error al actualizar el intento en la base de datos: {e}")
+            return jsonify({"error": f"Error interno al actualizar el intento: {e}"}), 500
 
         return jsonify({
             "msg": "Intento finalizado y corregido con IA exitosamente",
