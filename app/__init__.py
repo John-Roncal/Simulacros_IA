@@ -13,7 +13,7 @@ def create_app():
     global db_client, db
     
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": ["http://localhost:4200","http://127.0.0.1:4200"]}})
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:4200","http://127.0.0.1:4200","https://simulacros-ia-frontend.onrender.com"]}})
     app.config['JSON_AS_ASCII'] = False
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-super-secret-key')
 
