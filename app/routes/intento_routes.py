@@ -132,7 +132,6 @@ def finalizar_intento(intento_id):
 
         # Generar feedback con IA
         feedback_json_str = generar_feedback_ia(prompt)
-        print(feedback_json_str)
 
         feedback_alumno_general = "No se pudo generar el feedback."
         feedback_docente_general = "No se pudo generar el feedback."
